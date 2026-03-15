@@ -4,9 +4,10 @@
   "private": true,
   "description": "Minimal NestJS backend for Knowledge Workspace (single instance, PostgreSQL, local uploads)",
   "scripts": {
+    "build": "nest build",
     "start": "nest start",
     "start:dev": "nest start --watch",
-    "build": "nest build"
+    "start:prod": "node dist/main.js"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
