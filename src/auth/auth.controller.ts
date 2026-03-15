@@ -22,11 +22,12 @@ export class AuthController {
   ) {
     const { accessToken } = await this.auth.login(dto.email, dto.password);
     const isProd = process.env.NODE_ENV === "production";
-
+    console.log("Setting cookie with access token:", accessToken);
+    console.log("Setting cookie with access token:", isProd);
    res.cookie("accessToken", accessToken, {
   httpOnly: true,
-  secure: isProd, // only true in prod
-  sameSite: "strict",
+  secure: isProd,          // true in prod (Render HTTPS)
+  sameSite: "lax",         // important for cross-origin localhost testing
   maxAge: 1000 * 60 * 60 * 24,
 });
 
@@ -42,11 +43,11 @@ export class AuthController {
   @Post("logout")
   logout(@Res({ passthrough: true }) res: Response) {
     const isProd = process.env.NODE_ENV === "production";
-    res.clearCookie("accessToken", {
-      httpOnly: true,
-      secure: isProd,
-      sameSite: isProd ? "strict" : "lax",
-    });
+      res.clearCookie("accessToken", {
+        httpOnly: true,
+        secure: isProd,
+        sameSite: isProd ? "strict" : "lax",
+      });
     return { message: "Logged out" };
   }
 }
