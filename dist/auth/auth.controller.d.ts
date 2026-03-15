@@ -2,9 +2,11 @@ import { AuthService } from "./auth.service";
 import { RegisterDto } from "./dto/register.dto";
 import { LoginDto } from "./dto/login.dto";
 import { Response } from "express";
+import { ConfigService } from "@nestjs/config";
 export declare class AuthController {
     private auth;
-    constructor(auth: AuthService);
+    private config;
+    constructor(auth: AuthService, config: ConfigService);
     register(dto: RegisterDto): Promise<{
         accessToken: string;
     }>;

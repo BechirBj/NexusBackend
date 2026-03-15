@@ -1,13 +1,25 @@
-import { Body, Controller, Get, Post, Res, UseGuards } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Res,
+  UseGuards,
+} from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { RegisterDto } from "./dto/register.dto";
 import { LoginDto } from "./dto/login.dto";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import { CurrentUser } from "../common/decorators/current-user.decorator";
 import { Response } from "express";
+import { ConfigService } from "@nestjs/config";
+
 @Controller("auth")
 export class AuthController {
-  constructor(private auth: AuthService) {}
+  constructor(
+    private auth: AuthService,
+    private config: ConfigService,
+  ) {}
 
   @Post("register")
   register(@Body() dto: RegisterDto) {
@@ -21,31 +33,37 @@ export class AuthController {
     @Body() dto: LoginDto,
   ) {
     const { accessToken } = await this.auth.login(dto.email, dto.password);
-    const isProd = process.env.NODE_ENV === "production";
+
+    const isProd = this.config.get<string>("MODE_ENV") === "production";
+
     console.log("Setting cookie with access token:", accessToken);
-    console.log("Setting cookie with access token:", isProd);
-   res.cookie("accessToken", accessToken, {
-        httpOnly: true,
-        secure: true,
-        sameSite:"none",
-});
+    console.log("Production mode:", isProd);
+
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: isProd ? "none" : "lax",
+    });
 
     return { message: "Logged in successfully" };
   }
 
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @Get("me")
-  me(@CurrentUser() user: { sub: string; email: string ,name: string}) {
-    return user;    
+  me(@CurrentUser() user: { sub: string; email: string; name: string }) {
+    return user;
   }
 
   @Post("logout")
   logout(@Res({ passthrough: true }) res: Response) {
-    const isProd = process.env.NODE_ENV === "production";
-      res.clearCookie("accessToken", {
-        httpOnly: true,
-        secure: true,
-      });
+    const isProd = this.config.get<string>("MODE_ENV") === "production";
+
+    res.clearCookie("accessToken", {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: isProd ? "none" : "lax",
+    });
+
     return { message: "Logged out" };
   }
 }

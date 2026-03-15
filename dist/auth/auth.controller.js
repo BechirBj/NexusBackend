@@ -17,11 +17,12 @@ const common_1 = require("@nestjs/common");
 const auth_service_1 = require("./auth.service");
 const register_dto_1 = require("./dto/register.dto");
 const login_dto_1 = require("./dto/login.dto");
-const jwt_auth_guard_1 = require("../common/guards/jwt-auth.guard");
 const current_user_decorator_1 = require("../common/decorators/current-user.decorator");
+const config_1 = require("@nestjs/config");
 let AuthController = class AuthController {
-    constructor(auth) {
+    constructor(auth, config) {
         this.auth = auth;
+        this.config = config;
     }
     register(dto) {
         console.log("Registering user:", dto);
@@ -29,12 +30,13 @@ let AuthController = class AuthController {
     }
     async login(res, dto) {
         const { accessToken } = await this.auth.login(dto.email, dto.password);
-        const isProd = process.env.NODE_ENV === "production";
+        const isProd = this.config.get("MODE_ENV") === "production";
+        console.log("Setting cookie with access token:", accessToken);
+        console.log("Production mode:", isProd);
         res.cookie("accessToken", accessToken, {
             httpOnly: true,
             secure: isProd,
-            sameSite: "strict",
-            maxAge: 1000 * 60 * 60 * 24,
+            sameSite: isProd ? "none" : "lax",
         });
         return { message: "Logged in successfully" };
     }
@@ -42,11 +44,11 @@ let AuthController = class AuthController {
         return user;
     }
     logout(res) {
-        const isProd = process.env.NODE_ENV === "production";
+        const isProd = this.config.get("MODE_ENV") === "production";
         res.clearCookie("accessToken", {
             httpOnly: true,
             secure: isProd,
-            sameSite: isProd ? "strict" : "lax",
+            sameSite: isProd ? "none" : "lax",
         });
         return { message: "Logged out" };
     }
@@ -68,7 +70,6 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "login", null);
 __decorate([
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Get)("me"),
     __param(0, (0, current_user_decorator_1.CurrentUser)()),
     __metadata("design:type", Function),
@@ -84,6 +85,7 @@ __decorate([
 ], AuthController.prototype, "logout", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)("auth"),
-    __metadata("design:paramtypes", [auth_service_1.AuthService])
+    __metadata("design:paramtypes", [auth_service_1.AuthService,
+        config_1.ConfigService])
 ], AuthController);
 //# sourceMappingURL=auth.controller.js.map
