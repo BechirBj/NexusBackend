@@ -3,11 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "description": "Minimal NestJS backend for Knowledge Workspace (single instance, PostgreSQL, local uploads)",
-  "scripts": {
-    "build": "nest build",
-    "start": "node dist/main",
-    "start:dev": "nest start --watch"
-  },
+ "scripts": {
+  "build": "tsc",
+  "start": "node dist/main",
+  "start:dev": "nest start --watch"
+},
   "dependencies": {
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.1.1",
