@@ -20,7 +20,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
     @Body() dto: LoginDto,
   ) {
-    const { accessToken } = await this.auth.loin(dto.email, dto.password);
+    const { accessToken } = await this.auth.login(dto.email, dto.password);
     const isProd = process.env.NODE_ENV === "production";
     console.log("Setting cookie with access token:", accessToken);
     console.log("Setting cookie with access token:", isProd);
