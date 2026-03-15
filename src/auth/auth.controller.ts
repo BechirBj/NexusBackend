@@ -25,10 +25,8 @@ export class AuthController {
     console.log("Setting cookie with access token:", accessToken);
     console.log("Setting cookie with access token:", isProd);
    res.cookie("accessToken", accessToken, {
-  httpOnly: true,
-  secure: isProd,          // true in prod (Render HTTPS)
-  sameSite: "lax",         // important for cross-origin localhost testing
-  maxAge: 1000 * 60 * 60 * 24,
+        httpOnly: true,
+        secure: true,
 });
 
     return { message: "Logged in successfully" };
@@ -45,8 +43,7 @@ export class AuthController {
     const isProd = process.env.NODE_ENV === "production";
       res.clearCookie("accessToken", {
         httpOnly: true,
-        secure: isProd,
-        sameSite: isProd ? "strict" : "lax",
+        secure: true,
       });
     return { message: "Logged out" };
   }
