@@ -32,7 +32,7 @@ let AuthController = class AuthController {
         const isProd = process.env.NODE_ENV === "production";
         res.cookie("accessToken", accessToken, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
+            secure: isProd,
             sameSite: "strict",
             maxAge: 1000 * 60 * 60 * 24,
         });
