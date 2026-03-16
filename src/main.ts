@@ -15,18 +15,10 @@ async function bootstrap() {
 
   // enable CORS
   app.enableCors({
-    exposedHeaders: ["Set-Cookie"],
-    origin: /^http:\/\/localhost:\d+$/, // allow any localhost port
-    credentials: true,  
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-                // allow cookies
-    allowedHeaders: [
-"Origin",
-"Content-Type",
-"Accept",
-"Authorization",
-"X-Request-With",
-], // allow auth header
+    origin: ['https://www.your-frontend-domain.com', 'http://localhost:7373'], // Use an array or string
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true, // Needed if you use cookies or authorization headers
+    allowedHeaders: 'Content-Type, Authorization',
   });
 
   const config = app.get(ConfigService);

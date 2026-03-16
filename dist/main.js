@@ -11,17 +11,10 @@ async function bootstrap() {
     app.useGlobalPipes(new common_1.ValidationPipe({ whitelist: true, transform: true }));
     app.use(cookieParser());
     app.enableCors({
-        exposedHeaders: ["Set-Cookie"],
-        origin: /^http:\/\/localhost:\d+$/,
+        origin: ['https://www.your-frontend-domain.com', 'http://localhost:7373'],
+        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
         credentials: true,
-        methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-        allowedHeaders: [
-            "Origin",
-            "Content-Type",
-            "Accept",
-            "Authorization",
-            "X-Request-With",
-        ],
+        allowedHeaders: 'Content-Type, Authorization',
     });
     const config = app.get(config_1.ConfigService);
     const port = (_a = config.get('PORT')) !== null && _a !== void 0 ? _a : 7373;
