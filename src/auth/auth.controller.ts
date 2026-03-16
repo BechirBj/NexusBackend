@@ -39,11 +39,11 @@ export class AuthController {
     console.log("Setting cookie with access token:", accessToken);
     console.log("Production mode:", isProd);
 
-    res.cookie("accessToken", accessToken, {
-      httpOnly: true,
-      secure: isProd,
-      sameSite: isProd ? "none" : "lax",
-    });
+   res.cookie("accessToken", accessToken, {
+  httpOnly: true,
+  secure: true,
+  sameSite: "none",
+});
 
     return { message: "Logged in successfully" };
   }
