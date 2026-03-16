@@ -16,12 +16,20 @@ export class AuthService {
   }
 
   async login(email: string, password: string) {
-    const user = await this.users.findByEmail(email);
-    if (!user) throw new UnauthorizedException('Invalid credentials');
-    const ok = await bcrypt.compare(password, user.password);
-    if (!ok) throw new UnauthorizedException('Invalid credentials');
-    return this.signToken(user.id, user.email, user.name);
-  }
+  console.log("LOGIN EMAIL:", email);
+
+  const user = await this.users.findByEmail(email);
+  console.log("USER FOUND:", user);
+
+  if (!user) throw new UnauthorizedException('Invalid credentials');
+
+  const ok = await bcrypt.compare(password, user.password);
+  console.log("PASSWORD MATCH:", ok);
+
+  if (!ok) throw new UnauthorizedException('Invalid credentials');
+
+  return this.signToken(user.id, user.email, user.name);
+}
 
   // payload: { sub, email }
   signToken(userId: string, email: string, name: string) {
