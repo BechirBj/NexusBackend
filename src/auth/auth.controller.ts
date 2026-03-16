@@ -48,7 +48,7 @@ export class AuthController {
     return { message: "Logged in successfully" };
   }
 
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Get("me")
   me(@CurrentUser() user: { sub: string; email: string; name: string }) {
     return user;
