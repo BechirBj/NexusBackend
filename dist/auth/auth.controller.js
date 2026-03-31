@@ -17,6 +17,7 @@ const common_1 = require("@nestjs/common");
 const auth_service_1 = require("./auth.service");
 const register_dto_1 = require("./dto/register.dto");
 const login_dto_1 = require("./dto/login.dto");
+const jwt_auth_guard_1 = require("../common/guards/jwt-auth.guard");
 const current_user_decorator_1 = require("../common/decorators/current-user.decorator");
 const config_1 = require("@nestjs/config");
 let AuthController = class AuthController {
@@ -35,8 +36,8 @@ let AuthController = class AuthController {
         console.log("Production mode:", isProd);
         res.cookie("accessToken", accessToken, {
             httpOnly: true,
-            secure: isProd,
-            sameSite: isProd ? "none" : "lax",
+            secure: true,
+            sameSite: "none",
         });
         return { message: "Logged in successfully" };
     }
@@ -70,6 +71,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "login", null);
 __decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Get)("me"),
     __param(0, (0, current_user_decorator_1.CurrentUser)()),
     __metadata("design:type", Function),

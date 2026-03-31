@@ -21,7 +21,6 @@ const create_workspace_dto_1 = require("./dto/create-workspace.dto");
 const update_workspace_dto_1 = require("./dto/update-workspace.dto");
 const invite_member_dto_1 = require("./dto/invite-member.dto");
 const update_member_role_dto_1 = require("./dto/update-member-role.dto");
-const remove_member_dto_1 = require("./dto/remove-member.dto");
 let WorkspacesController = class WorkspacesController {
     constructor(service) {
         this.service = service;
@@ -31,7 +30,7 @@ let WorkspacesController = class WorkspacesController {
     }
     create(user, dto) {
         console.log(user);
-        console.log('Creating workspace with data:', dto);
+        console.log("Creating workspace with data:", dto);
         return this.service.create(user.sub, dto.name, dto.description);
     }
     get(user, id) {
@@ -44,13 +43,19 @@ let WorkspacesController = class WorkspacesController {
         return this.service.delete(id, user.sub);
     }
     invite(user, id, dto) {
+        console.log("Inviting member to workspace:", id, dto);
         return this.service.invite(id, user.sub, dto.email, dto.role);
     }
     updateRole(user, dto) {
         return this.service.updateMemberRole(dto.memberId, user.sub, dto.role);
     }
-    removeMember(user, dto) {
-        return this.service.removeMember(dto.memberId, user.sub);
+    getMembers(user, workspaceId) {
+        return this.service.getMembers(workspaceId, user.sub);
+    }
+    removeMember(user, memberId) {
+        console.log("Removing member from workspace:", memberId);
+        console.log("Current user:", user);
+        return this.service.removeMember(memberId, user.sub);
     }
 };
 exports.WorkspacesController = WorkspacesController;
@@ -70,41 +75,41 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], WorkspacesController.prototype, "create", null);
 __decorate([
-    (0, common_1.Get)(':id'),
+    (0, common_1.Get)(":id"),
     __param(0, (0, current_user_decorator_1.CurrentUser)()),
-    __param(1, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Param)("id")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, String]),
     __metadata("design:returntype", void 0)
 ], WorkspacesController.prototype, "get", null);
 __decorate([
-    (0, common_1.Patch)(':id'),
+    (0, common_1.Patch)(":id"),
     __param(0, (0, current_user_decorator_1.CurrentUser)()),
-    __param(1, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Param)("id")),
     __param(2, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, String, update_workspace_dto_1.UpdateWorkspaceDto]),
     __metadata("design:returntype", void 0)
 ], WorkspacesController.prototype, "update", null);
 __decorate([
-    (0, common_1.Delete)(':id'),
+    (0, common_1.Delete)(":id"),
     __param(0, (0, current_user_decorator_1.CurrentUser)()),
-    __param(1, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Param)("id")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, String]),
     __metadata("design:returntype", void 0)
 ], WorkspacesController.prototype, "remove", null);
 __decorate([
-    (0, common_1.Post)(':id/invite'),
+    (0, common_1.Post)(":id/invite"),
     __param(0, (0, current_user_decorator_1.CurrentUser)()),
-    __param(1, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Param)("id")),
     __param(2, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, String, invite_member_dto_1.InviteMemberDto]),
     __metadata("design:returntype", void 0)
 ], WorkspacesController.prototype, "invite", null);
 __decorate([
-    (0, common_1.Patch)('member-role'),
+    (0, common_1.Patch)("member-role"),
     __param(0, (0, current_user_decorator_1.CurrentUser)()),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -112,16 +117,24 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], WorkspacesController.prototype, "updateRole", null);
 __decorate([
-    (0, common_1.Delete)('member'),
+    (0, common_1.Get)(":workspaceId/members"),
     __param(0, (0, current_user_decorator_1.CurrentUser)()),
-    __param(1, (0, common_1.Body)()),
+    __param(1, (0, common_1.Param)("workspaceId")),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, remove_member_dto_1.RemoveMemberDto]),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", void 0)
+], WorkspacesController.prototype, "getMembers", null);
+__decorate([
+    (0, common_1.Delete)("member/:id"),
+    __param(0, (0, current_user_decorator_1.CurrentUser)()),
+    __param(1, (0, common_1.Param)("id")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
     __metadata("design:returntype", void 0)
 ], WorkspacesController.prototype, "removeMember", null);
 exports.WorkspacesController = WorkspacesController = __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
-    (0, common_1.Controller)('workspaces'),
+    (0, common_1.Controller)("workspaces"),
     __metadata("design:paramtypes", [workspaces_service_1.WorkspacesService])
 ], WorkspacesController);
 //# sourceMappingURL=workspaces.controller.js.map

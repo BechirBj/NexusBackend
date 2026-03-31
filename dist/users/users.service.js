@@ -31,6 +31,9 @@ let UsersService = class UsersService {
     findById(id) {
         return this.repo.findOne({ where: { id } });
     }
+    findAll() {
+        return this.repo.find();
+    }
 };
 exports.UsersService = UsersService;
 exports.UsersService = UsersService = __decorate([

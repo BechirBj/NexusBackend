@@ -28,20 +28,41 @@ let DocumentsService = class DocumentsService {
         this.activities = activities;
     }
     async ensureSubjectMember(subjectId, userId) {
-        const subject = await this.subjectRepo.findOne({ where: { id: subjectId } });
+        const subject = await this.subjectRepo.findOne({
+            where: { id: subjectId },
+        });
         if (!subject)
-            throw new common_1.NotFoundException('Subject not found');
-        const m = await this.wmRepo.findOne({ where: { workspaceId: subject.workspaceId, userId } });
+            throw new common_1.NotFoundException("Subject not found");
+        const m = await this.wmRepo.findOne({
+            where: { workspaceId: subject.workspaceId, userId },
+        });
         if (!m)
             throw new common_1.ForbiddenException();
         return subject;
     }
+    async ensureSubjectEditor(subjectId, userId) {
+        const subject = await this.subjectRepo.findOne({
+            where: { id: subjectId },
+        });
+        if (!subject)
+            throw new common_1.NotFoundException("Subject not found");
+        const membership = await this.wmRepo.findOne({
+            where: { workspaceId: subject.workspaceId, userId },
+        });
+        console.log(membership);
+        if (!membership)
+            throw new common_1.ForbiddenException("Not a workspace member");
+        if (membership.role === "viewer") {
+            throw new common_1.ForbiddenException("You do not have permission to upload");
+        }
+        return subject;
+    }
     async upload(userId, subjectId, title, file) {
-        const subject = await this.ensureSubjectMember(subjectId, userId);
+        const subject = await this.ensureSubjectEditor(subjectId, userId);
         const doc = this.repo.create({
             subjectId,
             title,
-            filePath: file.path.replace(/\\/g, '/'),
+            filePath: file.path.replace(/\\/g, "/"),
             originalFileName: file.originalname,
             fileSize: file.size,
             uploadedBy: userId,
@@ -51,20 +72,42 @@ let DocumentsService = class DocumentsService {
             workspaceId: subject.workspaceId,
             subjectId,
             userId,
-            type: 'DOCUMENT_UPLOAD',
+            type: "DOCUMENT_UPLOAD",
             metadata: { documentId: saved.id, title },
         });
         return saved;
+    }
+    async updateTitle(id, title, userId) {
+        const doc = await this.repo.findOne({
+            where: { id },
+            relations: ["subject"],
+        });
+        if (!doc)
+            throw new common_1.NotFoundException();
+        await this.ensureSubjectEditor(doc.subjectId, userId);
+        doc.title = title;
+        const updated = await this.repo.save(doc);
+        await this.activities.create({
+            workspaceId: doc.subject.workspaceId,
+            subjectId: doc.subjectId,
+            userId,
+            type: "DOCUMENT_EDIT",
+            metadata: { documentId: id, title },
+        });
+        return updated;
     }
     async listBySubject(subjectId, userId) {
         await this.ensureSubjectMember(subjectId, userId);
         return this.repo.find({ where: { subjectId } });
     }
     async delete(id, userId) {
-        const doc = await this.repo.findOne({ where: { id }, relations: ['subject'] });
+        const doc = await this.repo.findOne({
+            where: { id },
+            relations: ["subject"],
+        });
         if (!doc)
             throw new common_1.NotFoundException();
-        await this.ensureSubjectMember(doc.subjectId, userId);
+        await this.ensureSubjectEditor(doc.subjectId, userId);
         await this.repo.delete(id);
         return { deleted: true };
     }

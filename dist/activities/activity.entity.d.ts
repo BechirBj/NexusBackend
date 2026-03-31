@@ -1,4 +1,4 @@
-export type ActivityType = 'DOCUMENT_UPLOAD' | 'REPORT_CREATE' | 'REPORT_EDIT';
+export type ActivityType = 'DOCUMENT_UPLOAD' | 'DOCUMENT_EDIT' | 'REPORT_CREATE' | 'REPORT_EDIT';
 export declare class Activity {
     id: string;
     workspaceId: string;

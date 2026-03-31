@@ -28,10 +28,13 @@ let AuthService = class AuthService {
         return this.signToken(user.id, user.email, user.name);
     }
     async login(email, password) {
+        console.log("LOGIN EMAIL:", email);
         const user = await this.users.findByEmail(email);
+        console.log("USER FOUND:", user);
         if (!user)
             throw new common_1.UnauthorizedException('Invalid credentials');
         const ok = await bcrypt.compare(password, user.password);
+        console.log("PASSWORD MATCH:", ok);
         if (!ok)
             throw new common_1.UnauthorizedException('Invalid credentials');
         return this.signToken(user.id, user.email, user.name);

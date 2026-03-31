@@ -35,7 +35,7 @@ let WorkspacesService = class WorkspacesService {
     async create(userId, name, description) {
         const ws = this.wsRepo.create({ name, description, ownerId: userId });
         const saved = await this.wsRepo.save(ws);
-        await this.wmRepo.save(this.wmRepo.create({ workspaceId: saved.id, userId, role: 'owner' }));
+        await this.wmRepo.save(this.wmRepo.create({ workspaceId: saved.id, userId, role: "owner" }));
         return saved;
     }
     async get(id, userId) {
@@ -56,8 +56,12 @@ let WorkspacesService = class WorkspacesService {
         await this.ensureOwner(workspaceId, ownerId);
         const user = await this.usersRepo.findOne({ where: { email } });
         if (!user)
-            throw new common_1.NotFoundException('User not found');
-        const membership = this.wmRepo.create({ workspaceId, userId: user.id, role });
+            throw new common_1.NotFoundException("User not found");
+        const membership = this.wmRepo.create({
+            workspaceId,
+            userId: user.id,
+            role,
+        });
         return this.wmRepo.save(membership);
     }
     async updateMemberRole(memberId, ownerId, role) {
@@ -73,8 +77,28 @@ let WorkspacesService = class WorkspacesService {
         if (!member)
             throw new common_1.NotFoundException();
         await this.ensureOwner(member.workspaceId, ownerId);
+        if (member.userId === ownerId) {
+            throw new common_1.BadRequestException("You cannot remove yourself from your own workspace");
+        }
         await this.wmRepo.delete(memberId);
         return { removed: true };
+    }
+    async getMembers(workspaceId, userId) {
+        await this.ensureMember(workspaceId, userId);
+        const memberships = await this.wmRepo.find({ where: { workspaceId } });
+        const userIds = [...new Set(memberships.map((m) => m.userId))];
+        const users = await this.usersRepo.findByIds(userIds);
+        return memberships.map((m) => {
+            const user = users.find((u) => u.id === m.userId);
+            const currentUserMembership = memberships.find((m) => m.userId === userId);
+            return {
+                currentUserRole: (currentUserMembership === null || currentUserMembership === void 0 ? void 0 : currentUserMembership.role) || "member",
+                membershipId: m.id,
+                userId: m.userId,
+                role: m.role,
+                ...user,
+            };
+        });
     }
     async ensureMember(workspaceId, userId) {
         const m = await this.wmRepo.findOne({ where: { workspaceId, userId } });
@@ -83,8 +107,8 @@ let WorkspacesService = class WorkspacesService {
     }
     async ensureOwner(workspaceId, userId) {
         const m = await this.wmRepo.findOne({ where: { workspaceId, userId } });
-        if (!m || m.role !== 'owner')
-            throw new common_1.ForbiddenException('Owner required');
+        if (!m || m.role !== "owner")
+            throw new common_1.ForbiddenException("Owner required");
     }
 };
 exports.WorkspacesService = WorkspacesService;

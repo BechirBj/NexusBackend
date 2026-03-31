@@ -1,9 +1,8 @@
-import { WorkspacesService } from './workspaces.service';
-import { CreateWorkspaceDto } from './dto/create-workspace.dto';
-import { UpdateWorkspaceDto } from './dto/update-workspace.dto';
-import { InviteMemberDto } from './dto/invite-member.dto';
-import { UpdateMemberRoleDto } from './dto/update-member-role.dto';
-import { RemoveMemberDto } from './dto/remove-member.dto';
+import { WorkspacesService } from "./workspaces.service";
+import { CreateWorkspaceDto } from "./dto/create-workspace.dto";
+import { UpdateWorkspaceDto } from "./dto/update-workspace.dto";
+import { InviteMemberDto } from "./dto/invite-member.dto";
+import { UpdateMemberRoleDto } from "./dto/update-member-role.dto";
 export declare class WorkspacesController {
     private service;
     constructor(service: WorkspacesService);
@@ -32,9 +31,25 @@ export declare class WorkspacesController {
     updateRole(user: {
         sub: string;
     }, dto: UpdateMemberRoleDto): Promise<import("./workspace-member.entity").WorkspaceMember>;
+    getMembers(user: {
+        sub: string;
+    }, workspaceId: string): Promise<{
+        id: string;
+        email: string;
+        password: string;
+        name: string;
+        createdAt: Date;
+        updatedAt: Date;
+        ownedWorkspaces: import("./workspace.entity").Workspace[];
+        memberships: import("./workspace-member.entity").WorkspaceMember[];
+        currentUserRole: string;
+        membershipId: string;
+        userId: string;
+        role: import("./workspace-member.entity").WorkspaceRole;
+    }[]>;
     removeMember(user: {
         sub: string;
-    }, dto: RemoveMemberDto): Promise<{
+    }, memberId: string): Promise<{
         removed: boolean;
     }>;
 }

@@ -11,6 +11,12 @@ export class UsersController {
   get(@Param('id') id: string) {
     return this.users.findById(id);
   }
+
+  @Get()
+  getAll() {
+    return this.users.findAll();
+  }
+
   @Get()
   qq(){
     return "Hello, Users!"

@@ -7,18 +7,18 @@ import {
   Patch,
   Post,
   UseGuards,
-} from '@nestjs/common';
-import { WorkspacesService } from './workspaces.service';
-import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
-import { CurrentUser } from '../common/decorators/current-user.decorator';
-import { CreateWorkspaceDto } from './dto/create-workspace.dto';
-import { UpdateWorkspaceDto } from './dto/update-workspace.dto';
-import { InviteMemberDto } from './dto/invite-member.dto';
-import { UpdateMemberRoleDto } from './dto/update-member-role.dto';
-import { RemoveMemberDto } from './dto/remove-member.dto';
+} from "@nestjs/common";
+import { WorkspacesService } from "./workspaces.service";
+import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
+import { CurrentUser } from "../common/decorators/current-user.decorator";
+import { CreateWorkspaceDto } from "./dto/create-workspace.dto";
+import { UpdateWorkspaceDto } from "./dto/update-workspace.dto";
+import { InviteMemberDto } from "./dto/invite-member.dto";
+import { UpdateMemberRoleDto } from "./dto/update-member-role.dto";
+import { RemoveMemberDto } from "./dto/remove-member.dto";
 
 @UseGuards(JwtAuthGuard)
-@Controller('workspaces')
+@Controller("workspaces")
 export class WorkspacesController {
   constructor(private service: WorkspacesService) {}
 
@@ -28,43 +28,66 @@ export class WorkspacesController {
   }
 
   @Post()
-  create(@CurrentUser() user: { sub: string; email: string ,name: string}, @Body() dto: CreateWorkspaceDto) {
+  create(
+    @CurrentUser() user: { sub: string; email: string; name: string },
+    @Body() dto: CreateWorkspaceDto,
+  ) {
     console.log(user);
-    console.log('Creating workspace with data:', dto);
+    console.log("Creating workspace with data:", dto);
     return this.service.create(user.sub, dto.name, dto.description);
   }
 
-  @Get(':id')
-  get(@CurrentUser() user: { sub: string }, @Param('id') id: string) {
+  @Get(":id")
+  get(@CurrentUser() user: { sub: string }, @Param("id") id: string) {
     return this.service.get(id, user.sub);
   }
 
-  @Patch(':id')
+  @Patch(":id")
   update(
     @CurrentUser() user: { sub: string },
-    @Param('id') id: string,
+    @Param("id") id: string,
     @Body() dto: UpdateWorkspaceDto,
   ) {
     return this.service.update(id, user.sub, dto);
   }
 
-  @Delete(':id')
-  remove(@CurrentUser() user: { sub: string }, @Param('id') id: string) {
+  @Delete(":id")
+  remove(@CurrentUser() user: { sub: string }, @Param("id") id: string) {
     return this.service.delete(id, user.sub);
   }
 
-  @Post(':id/invite')
-  invite(@CurrentUser() user: { sub: string }, @Param('id') id: string, @Body() dto: InviteMemberDto) {
+  @Post(":id/invite")
+  invite(
+    @CurrentUser() user: { sub: string },
+    @Param("id") id: string,
+    @Body() dto: InviteMemberDto,
+  ) {
+    console.log("Inviting member to workspace:", id, dto);
     return this.service.invite(id, user.sub, dto.email, dto.role);
   }
 
-  @Patch('member-role')
-  updateRole(@CurrentUser() user: { sub: string }, @Body() dto: UpdateMemberRoleDto) {
+  @Patch("member-role")
+  updateRole(
+    @CurrentUser() user: { sub: string },
+    @Body() dto: UpdateMemberRoleDto,
+  ) {
     return this.service.updateMemberRole(dto.memberId, user.sub, dto.role);
   }
+  @Get(":workspaceId/members")
+  getMembers(
+    @CurrentUser() user: { sub: string },
+    @Param("workspaceId") workspaceId: string,
+  ) {
+    return this.service.getMembers(workspaceId, user.sub);
+  }
 
-  @Delete('member')
-  removeMember(@CurrentUser() user: { sub: string }, @Body() dto: RemoveMemberDto) {
-    return this.service.removeMember(dto.memberId, user.sub);
+  @Delete("member/:id")
+  removeMember(
+    @CurrentUser() user: { sub: string },
+    @Param("id") memberId: string,
+  ) {
+    console.log("Removing member from workspace:", memberId);
+    console.log("Current user:", user);
+    return this.service.removeMember(memberId, user.sub);
   }
 }

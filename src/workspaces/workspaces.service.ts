@@ -1,15 +1,21 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, In } from 'typeorm';
-import { Workspace } from './workspace.entity';
-import { WorkspaceMember } from './workspace-member.entity';
-import { User } from '../users/user.entity';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+  BadRequestException,
+} from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository, In } from "typeorm";
+import { Workspace } from "./workspace.entity";
+import { WorkspaceMember } from "./workspace-member.entity";
+import { User } from "../users/user.entity";
 
 @Injectable()
 export class WorkspacesService {
   constructor(
     @InjectRepository(Workspace) private wsRepo: Repository<Workspace>,
-    @InjectRepository(WorkspaceMember) private wmRepo: Repository<WorkspaceMember>,
+    @InjectRepository(WorkspaceMember)
+    private wmRepo: Repository<WorkspaceMember>,
     @InjectRepository(User) private usersRepo: Repository<User>,
   ) {}
 
@@ -24,7 +30,7 @@ export class WorkspacesService {
     const ws = this.wsRepo.create({ name, description, ownerId: userId });
     const saved = await this.wsRepo.save(ws);
     await this.wmRepo.save(
-      this.wmRepo.create({ workspaceId: saved.id, userId, role: 'owner' }),
+      this.wmRepo.create({ workspaceId: saved.id, userId, role: "owner" }),
     );
     return saved;
   }
@@ -46,15 +52,28 @@ export class WorkspacesService {
     return { deleted: true };
   }
 
-  async invite(workspaceId: string, ownerId: string, email: string, role: 'editor' | 'viewer') {
+  async invite(
+    workspaceId: string,
+    ownerId: string,
+    email: string,
+    role: "editor" | "viewer",
+  ) {
     await this.ensureOwner(workspaceId, ownerId);
     const user = await this.usersRepo.findOne({ where: { email } });
-    if (!user) throw new NotFoundException('User not found');
-    const membership = this.wmRepo.create({ workspaceId, userId: user.id, role });
+    if (!user) throw new NotFoundException("User not found");
+    const membership = this.wmRepo.create({
+      workspaceId,
+      userId: user.id,
+      role,
+    });
     return this.wmRepo.save(membership);
   }
 
-  async updateMemberRole(memberId: string, ownerId: string, role: 'owner' | 'editor' | 'viewer') {
+  async updateMemberRole(
+    memberId: string,
+    ownerId: string,
+    role: "owner" | "editor" | "viewer",
+  ) {
     const member = await this.wmRepo.findOne({ where: { id: memberId } });
     if (!member) throw new NotFoundException();
     await this.ensureOwner(member.workspaceId, ownerId);
@@ -66,8 +85,31 @@ export class WorkspacesService {
     const member = await this.wmRepo.findOne({ where: { id: memberId } });
     if (!member) throw new NotFoundException();
     await this.ensureOwner(member.workspaceId, ownerId);
+    if (member.userId === ownerId) {
+      throw new BadRequestException(
+        "You cannot remove yourself from your own workspace",
+      );
+    }
     await this.wmRepo.delete(memberId);
     return { removed: true };
+  }
+  async getMembers(workspaceId: string, userId: string) {
+    await this.ensureMember(workspaceId, userId);
+    const memberships = await this.wmRepo.find({ where: { workspaceId } });
+    const userIds = [...new Set(memberships.map((m) => m.userId))];
+    const users = await this.usersRepo.findByIds(userIds);
+    return memberships.map((m) => {
+      const user = users.find((u) => u.id === m.userId);
+  const currentUserMembership = memberships.find((m) => m.userId === userId);
+
+      return {
+        currentUserRole: currentUserMembership?.role || "member", // <-- send role
+        membershipId: m.id, // ✅ IMPORTANT
+        userId: m.userId, // optional but clean
+        role: m.role,
+        ...user,
+      };
+    });
   }
 
   private async ensureMember(workspaceId: string, userId: string) {
@@ -77,6 +119,7 @@ export class WorkspacesService {
 
   private async ensureOwner(workspaceId: string, userId: string) {
     const m = await this.wmRepo.findOne({ where: { workspaceId, userId } });
-    if (!m || m.role !== 'owner') throw new ForbiddenException('Owner required');
+    if (!m || m.role !== "owner")
+      throw new ForbiddenException("Owner required");
   }
 }

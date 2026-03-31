@@ -1,6 +1,10 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
 
-export type ActivityType = 'DOCUMENT_UPLOAD' | 'REPORT_CREATE' | 'REPORT_EDIT';
+export type ActivityType =
+  | 'DOCUMENT_UPLOAD'
+  | 'DOCUMENT_EDIT'
+  | 'REPORT_CREATE'
+  | 'REPORT_EDIT';
 
 @Entity()
 export class Activity {

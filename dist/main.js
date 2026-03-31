@@ -11,10 +11,22 @@ async function bootstrap() {
     app.useGlobalPipes(new common_1.ValidationPipe({ whitelist: true, transform: true }));
     app.use(cookieParser());
     app.enableCors({
-        origin: ['https://www.your-frontend-domain.com', 'http://localhost:7373'],
-        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+        origin: (origin, callback) => {
+            const allowedOrigins = [
+                "http://localhost:3000",
+                "http://localhost:5173",
+                "https://nexus-web-neon.vercel.app/",
+            ];
+            if (!origin || allowedOrigins.includes(origin)) {
+                callback(null, true);
+            }
+            else {
+                callback(new Error("Not allowed by CORS"));
+            }
+        },
         credentials: true,
-        allowedHeaders: 'Content-Type, Authorization',
+        methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+        allowedHeaders: ["Content-Type", "Authorization"],
     });
     const config = app.get(config_1.ConfigService);
     const port = (_a = config.get('PORT')) !== null && _a !== void 0 ? _a : 7373;

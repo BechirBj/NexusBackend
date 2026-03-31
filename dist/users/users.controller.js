@@ -22,6 +22,9 @@ let UsersController = class UsersController {
     get(id) {
         return this.users.findById(id);
     }
+    getAll() {
+        return this.users.findAll();
+    }
     qq() {
         return "Hello, Users!";
     }
@@ -34,6 +37,12 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], UsersController.prototype, "get", null);
+__decorate([
+    (0, common_1.Get)(),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "getAll", null);
 __decorate([
     (0, common_1.Get)(),
     __metadata("design:type", Function),

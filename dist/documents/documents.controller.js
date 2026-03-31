@@ -19,6 +19,7 @@ const documents_service_1 = require("./documents.service");
 const jwt_auth_guard_1 = require("../common/guards/jwt-auth.guard");
 const current_user_decorator_1 = require("../common/decorators/current-user.decorator");
 const upload_document_dto_1 = require("./dto/upload-document.dto");
+const update_document_title_dto_1 = require("./dto/update-document-title.dto");
 let DocumentsController = class DocumentsController {
     constructor(service) {
         this.service = service;
@@ -28,6 +29,9 @@ let DocumentsController = class DocumentsController {
     }
     list(user, subjectId) {
         return this.service.listBySubject(subjectId, user.sub);
+    }
+    updateTitle(user, id, dto) {
+        return this.service.updateTitle(id, dto.title, user.sub);
     }
     delete(user, id) {
         return this.service.delete(id, user.sub);
@@ -52,6 +56,15 @@ __decorate([
     __metadata("design:paramtypes", [Object, String]),
     __metadata("design:returntype", void 0)
 ], DocumentsController.prototype, "list", null);
+__decorate([
+    (0, common_1.Patch)(':id'),
+    __param(0, (0, current_user_decorator_1.CurrentUser)()),
+    __param(1, (0, common_1.Param)('id')),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String, update_document_title_dto_1.UpdateDocumentTitleDto]),
+    __metadata("design:returntype", void 0)
+], DocumentsController.prototype, "updateTitle", null);
 __decorate([
     (0, common_1.Delete)(':id'),
     __param(0, (0, current_user_decorator_1.CurrentUser)()),

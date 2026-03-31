@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   UploadedFile,
   UseGuards,
@@ -14,6 +15,7 @@ import { DocumentsService } from './documents.service';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { UploadDocumentDto } from './dto/upload-document.dto';
+import { UpdateDocumentTitleDto } from './dto/update-document-title.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('documents')
@@ -35,6 +37,14 @@ export class DocumentsController {
     return this.service.listBySubject(subjectId, user.sub);
   }
 
+  @Patch(':id')
+  updateTitle(
+    @CurrentUser() user: { sub: string },
+    @Param('id') id: string,
+    @Body() dto: UpdateDocumentTitleDto,
+  ) {
+    return this.service.updateTitle(id, dto.title, user.sub);
+  }
 
   // @Get('GetBySubject/:subjectId')
   // getBySubject(@CurrentUser() user: { sub: string }, @Param('subjectId') subjectId: string) {

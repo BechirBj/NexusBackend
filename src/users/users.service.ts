@@ -19,4 +19,7 @@ export class UsersService {
   findById(id: string) {
     return this.repo.findOne({ where: { id } });
   }
+  findAll() {
+    return this.repo.find();
+  }
 }
