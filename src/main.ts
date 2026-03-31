@@ -19,7 +19,7 @@ async function bootstrap() {
     const allowedOrigins = [
       "http://localhost:3000",
       "http://localhost:5173",
-      "https://nexus-web-neon.vercel.app/",
+      "https://nexus-web-neon.vercel.app", // No trailing slash here
     ];
 
     if (!origin || allowedOrigins.includes(origin)) {
