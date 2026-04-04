@@ -6,12 +6,14 @@ import { UsersModule } from '../users/users.module';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './jwt.strategy';
+import { AdminModule } from 'src/admin/admin.module';
 
 @Module({
   imports: [
     ConfigModule,
     UsersModule,
     PassportModule,
+    AdminModule,
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({

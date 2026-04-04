@@ -15,6 +15,7 @@ const users_module_1 = require("../users/users.module");
 const auth_service_1 = require("./auth.service");
 const auth_controller_1 = require("./auth.controller");
 const jwt_strategy_1 = require("./jwt.strategy");
+const admin_module_1 = require("../admin/admin.module");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
@@ -24,6 +25,7 @@ exports.AuthModule = AuthModule = __decorate([
             config_1.ConfigModule,
             users_module_1.UsersModule,
             passport_1.PassportModule,
+            admin_module_1.AdminModule,
             jwt_1.JwtModule.registerAsync({
                 inject: [config_1.ConfigService],
                 useFactory: (config) => ({

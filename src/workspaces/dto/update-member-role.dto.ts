@@ -5,5 +5,5 @@ export class UpdateMemberRoleDto {
   memberId: string;
 
   @IsString()
-  role: 'owner' | 'editor' | 'viewer';
+  role: 'editor' | 'viewer';
 }

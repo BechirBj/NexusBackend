@@ -20,6 +20,7 @@ const login_dto_1 = require("./dto/login.dto");
 const jwt_auth_guard_1 = require("../common/guards/jwt-auth.guard");
 const current_user_decorator_1 = require("../common/decorators/current-user.decorator");
 const config_1 = require("@nestjs/config");
+const AdminLogin_Dto_1 = require("./AdminLogin.Dto");
 let AuthController = class AuthController {
     constructor(auth, config) {
         this.auth = auth;
@@ -53,6 +54,21 @@ let AuthController = class AuthController {
         });
         return { message: "Logged out" };
     }
+    async adminLogin(dto, res) {
+        const admin = await this.auth.validateAdmin(dto.email, dto.password);
+        if (!admin) {
+            throw new common_1.UnauthorizedException("Invalid credentials");
+        }
+        const { accessToken } = await this.auth.signInAdmin(admin);
+        const isProd = this.config.get("MODE_ENV") === "production";
+        res.cookie("accessToken", accessToken, {
+            httpOnly: true,
+            secure: isProd,
+            sameSite: isProd ? "none" : "lax",
+            maxAge: 1000 * 60 * 60 * 24,
+        });
+        return { message: "Admin logged in successfully" };
+    }
 };
 exports.AuthController = AuthController;
 __decorate([
@@ -85,6 +101,14 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "logout", null);
+__decorate([
+    (0, common_1.Post)("admin/login"),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Res)({ passthrough: true })),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [AdminLogin_Dto_1.AdminLoginDto, Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "adminLogin", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)("auth"),
     __metadata("design:paramtypes", [auth_service_1.AuthService,

@@ -12,41 +12,75 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
 const users_service_1 = require("../users/users.service");
+const admin_service_1 = require("../admin/admin.service");
 const bcrypt = require("bcrypt");
 const jwt_1 = require("@nestjs/jwt");
 let AuthService = class AuthService {
-    constructor(users, jwt) {
+    constructor(users, adminService, jwtService) {
         this.users = users;
-        this.jwt = jwt;
+        this.adminService = adminService;
+        this.jwtService = jwtService;
     }
     async register(email, password, name) {
         const exists = await this.users.findByEmail(email);
         if (exists)
-            throw new common_1.ConflictException('Email already registered');
+            throw new common_1.ConflictException("Email already registered");
         const hash = await bcrypt.hash(password, 10);
-        const user = await this.users.create({ email, password: hash, name });
-        return this.signToken(user.id, user.email, user.name);
+        const user = await this.users.create({
+            email,
+            password: hash,
+            name,
+        });
+        return this.signUserToken(user.id, user.email, user.name);
     }
     async login(email, password) {
-        console.log("LOGIN EMAIL:", email);
         const user = await this.users.findByEmail(email);
-        console.log("USER FOUND:", user);
         if (!user)
-            throw new common_1.UnauthorizedException('Invalid credentials');
-        const ok = await bcrypt.compare(password, user.password);
-        console.log("PASSWORD MATCH:", ok);
-        if (!ok)
-            throw new common_1.UnauthorizedException('Invalid credentials');
-        return this.signToken(user.id, user.email, user.name);
+            throw new common_1.UnauthorizedException("Invalid credentials");
+        const valid = await bcrypt.compare(password, user.password);
+        if (!valid)
+            throw new common_1.UnauthorizedException("Invalid credentials");
+        return this.signUserToken(user.id, user.email, user.name);
     }
-    signToken(userId, email, name) {
-        const payload = { sub: userId, email, name };
-        return { accessToken: this.jwt.sign(payload) };
+    signUserToken(userId, email, name) {
+        const payload = {
+            sub: userId,
+            email,
+            name,
+            role: "user",
+        };
+        return {
+            accessToken: this.jwtService.sign(payload),
+        };
+    }
+    async validateAdmin(email, password) {
+        const admin = await this.adminService.findAdminByEmail(email);
+        if (!admin)
+            return null;
+        const passwordValid = await bcrypt.compare(password, admin.password);
+        if (!passwordValid)
+            return null;
+        return admin;
+    }
+    async signInAdmin(admin) {
+        const payload = {
+            sub: admin.id,
+            email: admin.email,
+            role: admin.role,
+            name: admin.nom,
+            prenom: admin.prenom,
+            username: admin.username,
+        };
+        return {
+            accessToken: this.jwtService.sign(payload),
+        };
     }
 };
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [users_service_1.UsersService, jwt_1.JwtService])
+    __metadata("design:paramtypes", [users_service_1.UsersService,
+        admin_service_1.AdminService,
+        jwt_1.JwtService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

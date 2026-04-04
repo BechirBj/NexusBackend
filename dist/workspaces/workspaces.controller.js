@@ -21,16 +21,34 @@ const create_workspace_dto_1 = require("./dto/create-workspace.dto");
 const update_workspace_dto_1 = require("./dto/update-workspace.dto");
 const invite_member_dto_1 = require("./dto/invite-member.dto");
 const update_member_role_dto_1 = require("./dto/update-member-role.dto");
+const admin_update_member_role_dto_1 = require("./dto/admin-update-member-role.dto");
+const admin_invite_member_dto_1 = require("./dto/admin-invite-member.dto");
 let WorkspacesController = class WorkspacesController {
     constructor(service) {
         this.service = service;
+    }
+    adminList() {
+        return this.service.adminList();
+    }
+    adminUpdateMemberRole(dto) {
+        console.log("Admin updating member role:", dto);
+        return this.service.adminUpdateMemberRole(dto.memberId, dto.role);
+    }
+    adminGetMembers(workspaceId) {
+        return this.service.adminGetMembers(workspaceId);
+    }
+    async adminInvite(workspaceId, dto) {
+        console.log("Admin inviting member:", workspaceId, dto);
+        return this.service.adminInvite(workspaceId, dto.email, dto.role);
+    }
+    async adminRemoveMember(memberId) {
+        console.log("Admin removing member:", memberId);
+        return this.service.adminRemoveMember(memberId);
     }
     list(user) {
         return this.service.listForUser(user.sub);
     }
     create(user, dto) {
-        console.log(user);
-        console.log("Creating workspace with data:", dto);
         return this.service.create(user.sub, dto.name, dto.description);
     }
     get(user, id) {
@@ -43,7 +61,6 @@ let WorkspacesController = class WorkspacesController {
         return this.service.delete(id, user.sub);
     }
     invite(user, id, dto) {
-        console.log("Inviting member to workspace:", id, dto);
         return this.service.invite(id, user.sub, dto.email, dto.role);
     }
     updateRole(user, dto) {
@@ -53,12 +70,45 @@ let WorkspacesController = class WorkspacesController {
         return this.service.getMembers(workspaceId, user.sub);
     }
     removeMember(user, memberId) {
-        console.log("Removing member from workspace:", memberId);
-        console.log("Current user:", user);
         return this.service.removeMember(memberId, user.sub);
     }
 };
 exports.WorkspacesController = WorkspacesController;
+__decorate([
+    (0, common_1.Get)("admin"),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], WorkspacesController.prototype, "adminList", null);
+__decorate([
+    (0, common_1.Patch)("admin/member-role"),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [admin_update_member_role_dto_1.AdminUpdateMemberRoleDto]),
+    __metadata("design:returntype", void 0)
+], WorkspacesController.prototype, "adminUpdateMemberRole", null);
+__decorate([
+    (0, common_1.Get)("admin/:workspaceId/members"),
+    __param(0, (0, common_1.Param)("workspaceId")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], WorkspacesController.prototype, "adminGetMembers", null);
+__decorate([
+    (0, common_1.Post)("admin/:workspaceId/invite"),
+    __param(0, (0, common_1.Param)("workspaceId")),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, admin_invite_member_dto_1.AdminInviteMemberDto]),
+    __metadata("design:returntype", Promise)
+], WorkspacesController.prototype, "adminInvite", null);
+__decorate([
+    (0, common_1.Delete)("admin/member/:id"),
+    __param(0, (0, common_1.Param)("id")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], WorkspacesController.prototype, "adminRemoveMember", null);
 __decorate([
     (0, common_1.Get)(),
     __param(0, (0, current_user_decorator_1.CurrentUser)()),

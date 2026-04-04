@@ -1,11 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Res,
-  UseGuards,
-} from "@nestjs/common";
+import { Body, Controller, Get, Post, Res, UnauthorizedException, UseGuards } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { RegisterDto } from "./dto/register.dto";
 import { LoginDto } from "./dto/login.dto";
@@ -13,6 +6,7 @@ import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import { CurrentUser } from "../common/decorators/current-user.decorator";
 import { Response } from "express";
 import { ConfigService } from "@nestjs/config";
+import { AdminLoginDto } from "./AdminLogin.Dto";
 
 @Controller("auth")
 export class AuthController {
@@ -39,11 +33,11 @@ export class AuthController {
     console.log("Setting cookie with access token:", accessToken);
     console.log("Production mode:", isProd);
 
-   res.cookie("accessToken", accessToken, {
-  httpOnly: true,
-  secure: true,
-  sameSite: "none",
-});
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+    });
 
     return { message: "Logged in successfully" };
   }
@@ -66,4 +60,34 @@ export class AuthController {
 
     return { message: "Logged out" };
   }
+
+ @Post("admin/login")
+  async adminLogin(
+    @Body() dto: AdminLoginDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const admin = await this.auth.validateAdmin(
+      dto.email,
+      dto.password,
+    );
+
+    if (!admin) {
+      throw new UnauthorizedException("Invalid credentials");
+    }
+
+    const { accessToken } = await this.auth.signInAdmin(admin);
+
+    const isProd = this.config.get<string>("MODE_ENV") === "production";
+
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: isProd ? "none" : "lax",
+      maxAge: 1000 * 60 * 60 * 24,
+    });
+
+    return { message: "Admin logged in successfully" };
+  }
+
+  
 }

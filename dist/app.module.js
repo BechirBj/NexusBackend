@@ -21,6 +21,7 @@ const documents_module_1 = require("./documents/documents.module");
 const reports_module_1 = require("./reports/reports.module");
 const tags_module_1 = require("./tags/tags.module");
 const activities_module_1 = require("./activities/activities.module");
+const admin_module_1 = require("./admin/admin.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -53,6 +54,7 @@ exports.AppModule = AppModule = __decorate([
             tags_module_1.TagsModule,
             activities_module_1.ActivitiesModule,
             uploads_module_1.UploadsModule,
+            admin_module_1.AdminModule,
         ],
     })
 ], AppModule);

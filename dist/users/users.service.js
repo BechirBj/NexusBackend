@@ -34,6 +34,9 @@ let UsersService = class UsersService {
     findAll() {
         return this.repo.find();
     }
+    async delete(id) {
+        await this.repo.delete(id);
+    }
 };
 exports.UsersService = UsersService;
 exports.UsersService = UsersService = __decorate([

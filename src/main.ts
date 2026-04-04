@@ -18,6 +18,7 @@ async function bootstrap() {
   origin: (origin, callback) => {
     const allowedOrigins = [
       "http://localhost:3000",
+      "http://localhost:3001",
       "http://localhost:5173",
       "https://nexus-web-neon.vercel.app", // No trailing slash here
     ];
