@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { Workspace } from '../workspaces/workspace.entity';
 import { WorkspaceMember } from 'src/workspaces/workspace-member.entity';
+import { UserRole } from '../enums/user-role.enum';
 
 @Entity()
 export class User {
@@ -22,6 +23,9 @@ export class User {
 
   @Column()
   name: string;
+
+  @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
+  role: UserRole;
 
   @CreateDateColumn()
   createdAt: Date;

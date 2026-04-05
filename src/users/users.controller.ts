@@ -6,23 +6,20 @@ import { Roles } from "src/common/guards/roles.decorator";
 import { UserRole } from "src/enums/user-role.enum";
 
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles(UserRole.ADMIN)
 @Controller("users")
 export class UsersController {
   constructor(private users: UsersService) {}
 
-  @Get(":id")
-  get(@Param("id") id: string) {
-    return this.users.findById(id);
-  }
+  @Roles(UserRole.ADMIN)
   @Get()
   getAll() {
     return this.users.findAll();
   }
 
-  @Get("/hh")
-  qq() {
-    return "Hello, Users!";
+
+  @Get(":id")
+  get(@Param("id") id: string) {
+    return this.users.findById(id);
   }
 
   @Delete(":id")

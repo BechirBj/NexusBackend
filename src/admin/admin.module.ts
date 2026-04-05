@@ -6,9 +6,9 @@ import { Admin } from './entities/admin.entity';
 import { SeedService } from 'src/seeds/seed.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Admin]),], 
+  imports: [TypeOrmModule.forFeature([Admin])],
   controllers: [AdminController],
-  providers: [AdminService,SeedService],
-  exports: [AdminService,SeedService],
+  providers: [AdminService, SeedService],
+  exports: [AdminService, SeedService, TypeOrmModule],
 })
 export class AdminModule {}

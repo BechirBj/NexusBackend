@@ -19,6 +19,7 @@ export class SeedService implements OnModuleInit {
 
   private async seedAdminUser() {
   const adminEmail = process.env.ADMIN_EMAIL;
+  console.log('Seeding admin user with email:', adminEmail);
   const adminPassword = process.env.ADMIN_PASSWORD;
   const adminUsername = process.env.ADMIN_USERNAME;
   const adminName = process.env.ADMIN_NAME;
