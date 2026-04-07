@@ -2,8 +2,9 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AppModule } from './app.module';
-const cookieParser = require('cookie-parser');
+import 'dotenv/config';
 
+const cookieParser = require('cookie-parser');
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
@@ -20,7 +21,7 @@ async function bootstrap() {
       "http://localhost:3000",
       "http://localhost:3001",
       "http://localhost:5173",
-      "https://nexus-web-neon.vercel.app", // No trailing slash here
+      "https://nexus-web-hc7z.vercel.app/", 
     ];
 
     if (!origin || allowedOrigins.includes(origin)) {

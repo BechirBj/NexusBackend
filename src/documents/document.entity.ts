@@ -44,7 +44,10 @@ export class Document {
   tags: Tag[];
 
   @Column({ nullable: true })
-originalFileName: string;
+  originalFileName: string;
+
+  @Column({ nullable: true })
+  publicId: string;
 
   @CreateDateColumn()
   createdAt: Date;

@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   ForbiddenException,
+  BadRequestException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
@@ -9,7 +10,12 @@ import { Document } from "./document.entity";
 import { WorkspaceMember } from "../workspaces/workspace-member.entity";
 import { Subject } from "../subjects/subject.entity";
 import { ActivitiesService } from "src/activities/activities.service";
+import { v2 as cloudinary } from "cloudinary";
 
+export interface CloudinaryRawFile extends Express.Multer.File {
+  path: string;
+  public_id: string;
+}
 @Injectable()
 export class DocumentsService {
   constructor(
@@ -32,7 +38,6 @@ export class DocumentsService {
     return subject;
   }
   private async ensureSubjectEditor(subjectId: string, userId: string) {
-
     const subject = await this.subjectRepo.findOne({
       where: { id: subjectId },
     });
@@ -57,18 +62,26 @@ export class DocumentsService {
     userId: string,
     subjectId: string,
     title: string,
-    file: Express.Multer.File,
+    file: Express.Multer.File
   ) {
     const subject = await this.ensureSubjectEditor(subjectId, userId);
+
+    const cloudFile = file as CloudinaryRawFile;
+    console.log("Cloudinary upload result:", cloudFile);
+
     const doc = this.repo.create({
       subjectId,
       title,
-      filePath: file.path.replace(/\\/g, "/"),
-      originalFileName: file.originalname,
-      fileSize: file.size,
+      filePath: cloudFile.path,
+      publicId: cloudFile.public_id,
+      originalFileName: cloudFile.originalname,
+      fileSize: cloudFile.size,
       uploadedBy: userId,
     });
+    console.log("Saving document entity:", doc);
+
     const saved = await this.repo.save(doc);
+
     await this.activities.create({
       workspaceId: subject.workspaceId,
       subjectId,
@@ -76,6 +89,7 @@ export class DocumentsService {
       type: "DOCUMENT_UPLOAD",
       metadata: { documentId: saved.id, title },
     });
+
     return saved;
   }
 
@@ -104,6 +118,7 @@ export class DocumentsService {
   async listBySubject(subjectId: string, userId: string) {
     // console.log(userId)
     await this.ensureSubjectMember(subjectId, userId);
+    console.log("Listing documents for subject:",await this.repo.find({ where: { subjectId } }));
     return this.repo.find({ where: { subjectId } });
   }
 
@@ -116,5 +131,10 @@ export class DocumentsService {
     await this.ensureSubjectEditor(doc.subjectId, userId);
     await this.repo.delete(id);
     return { deleted: true };
+  }
+
+
+  async findOne(id: string) {
+    return this.repo.findOne({ where: { id } });
   }
 }

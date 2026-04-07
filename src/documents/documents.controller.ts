@@ -55,4 +55,5 @@ export class DocumentsController {
   delete(@CurrentUser() user: { sub: string }, @Param('id') id: string) {
     return this.service.delete(id, user.sub);
   }
+  
 }
