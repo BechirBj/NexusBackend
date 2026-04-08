@@ -22,6 +22,7 @@ async function bootstrap() {
       "http://localhost:3001",
       "http://localhost:5173",
       "https://nexus-web-hc7z.vercel.app", 
+      "https://nexus-nexus-admin.vercel.app",
     ];
 
     if (!origin || allowedOrigins.includes(origin)) {

@@ -77,6 +77,8 @@ export class AuthService {
       prenom: admin.prenom,
       username: admin.username,
     };
+    console.log("Admin payload for JWT:", payload);
+    console.log("Admin payload for JWT:", this.jwtService.sign(payload));
 
     return {
       accessToken: this.jwtService.sign(payload),

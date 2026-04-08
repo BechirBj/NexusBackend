@@ -78,7 +78,7 @@ export class AuthController {
     const { accessToken } = await this.auth.signInAdmin(admin);
 
     const isProd = this.config.get<string>("MODE_ENV") === "production";
-
+console.log("isProd:", isProd);
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
       secure: isProd,
