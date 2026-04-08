@@ -7,7 +7,10 @@ import 'dotenv/config';
 const cookieParser = require('cookie-parser');
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
+ console.log("ENV DEBUG:", {
+    MODE_ENV: process.env.MODE_ENV,
+    NODE_ENV: process.env.NODE_ENV,
+  });
   // global validation pipe for DTOs
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
 

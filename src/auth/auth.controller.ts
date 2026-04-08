@@ -28,16 +28,16 @@ export class AuthController {
   ) {
     const { accessToken } = await this.auth.login(dto.email, dto.password);
 
-    const isProd = this.config.get<string>("MODE_ENV") === "production";
+const isProd = process.env.MODE_ENV === "production";
 
     console.log("Setting cookie with access token:", accessToken);
     console.log("Production mode:", isProd);
 
     res.cookie("accessToken", accessToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-    });
+  httpOnly: true,
+  secure: isProd,
+  sameSite: isProd ? "none" : "lax",
+});
 
     return { message: "Logged in successfully" };
   }
@@ -50,7 +50,7 @@ export class AuthController {
 
   @Post("logout")
   logout(@Res({ passthrough: true }) res: Response) {
-    const isProd = this.config.get<string>("MODE_ENV") === "production";
+    const isProd = process.env.MODE_ENV === "production";
 
     res.clearCookie("accessToken", {
       httpOnly: true,
@@ -77,14 +77,13 @@ export class AuthController {
 
     const { accessToken } = await this.auth.signInAdmin(admin);
 
-    const isProd = this.config.get<string>("MODE_ENV") === "production";
+    const isProd = process.env.MODE_ENV === "production";
 console.log("isProd:", isProd);
     res.cookie("accessToken", accessToken, {
-      httpOnly: true,
-      secure: isProd,
-      sameSite: isProd ? "none" : "lax",
-      maxAge: 1000 * 60 * 60 * 24,
-    });
+  httpOnly: true,
+  secure: isProd,
+  sameSite: isProd ? "none" : "lax",
+});
 
     return { message: "Admin logged in successfully" };
   }
