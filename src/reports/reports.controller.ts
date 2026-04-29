@@ -12,6 +12,7 @@ export class ReportsController {
 
   @Post()
   create(@CurrentUser() user: { sub: string }, @Body() dto: CreateReportDto) {
+    console.log('Creating report with data:', dto);
     return this.service.create(user.sub, dto);
   }
 

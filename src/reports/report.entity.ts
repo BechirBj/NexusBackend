@@ -27,7 +27,7 @@ export class Report {
   @Column()
   title: string;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'text' ,default:""} )
   content: string;
 
   @Column({ type: 'varchar', default: 'draft' })

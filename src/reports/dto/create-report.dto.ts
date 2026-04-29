@@ -7,8 +7,8 @@ export class CreateReportDto {
   @IsString()
   title: string;
 
-  @IsString()
-  content: string;
+  // @IsString()
+  // content: string;
 
   @IsOptional()
   @IsEnum(['draft', 'final', 'archived'])
