@@ -1,19 +1,19 @@
-import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
+import { Module } from "@nestjs/common";
+import { ConfigModule, ConfigService } from "@nestjs/config";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { ServeStaticModule } from "@nestjs/serve-static";
+import { join } from "path";
 // Modules
-import { UploadsModule } from './uploads/uploads.module';
-import { AuthModule } from './auth/auth.module';
-import { UsersModule } from './users/users.module';
-import { WorkspacesModule } from './workspaces/workspaces.module';
-import { SubjectsModule } from './subjects/subjects.module';
-import { DocumentsModule } from './documents/documents.module';
-import { ReportsModule } from './reports/reports.module';
-import { TagsModule } from './tags/tags.module';
-import { ActivitiesModule } from './activities/activities.module';
-import { AdminModule } from './admin/admin.module';
+import { UploadsModule } from "./uploads/uploads.module";
+import { AuthModule } from "./auth/auth.module";
+import { UsersModule } from "./users/users.module";
+import { WorkspacesModule } from "./workspaces/workspaces.module";
+import { SubjectsModule } from "./subjects/subjects.module";
+import { DocumentsModule } from "./documents/documents.module";
+import { ReportsModule } from "./reports/reports.module";
+import { TagsModule } from "./tags/tags.module";
+import { ActivitiesModule } from "./activities/activities.module";
+import { AdminModule } from "./admin/admin.module";
 
 @Module({
   imports: [
@@ -21,18 +21,24 @@ import { AdminModule } from './admin/admin.module';
     ConfigModule.forRoot({ isGlobal: true }),
     // static serving for uploaded files
     ServeStaticModule.forRoot({
-      rootPath: join(process.cwd(), 'uploads'),
-      serveRoot: '/uploads',
+      rootPath: join(process.cwd(), "uploads"),
+      serveRoot: "/uploads",
     }),
     // database setup
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
-        const url = config.get<string>('DATABASE_URL');
+        const url = config.get<string>("SUPABASE_URL");
         return {
-          type: 'postgres',
+          type: "postgres",
           url,
+
+          ssl: {
+            rejectUnauthorized: false,
+          },
+
           autoLoadEntities: true,
+
           synchronize: true, // dev only
         };
       },

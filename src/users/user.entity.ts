@@ -10,7 +10,7 @@ import { Workspace } from '../workspaces/workspace.entity';
 import { WorkspaceMember } from 'src/workspaces/workspace-member.entity';
 import { UserRole } from '../enums/user-role.enum';
 
-@Entity()
+@Entity("users")
 export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;

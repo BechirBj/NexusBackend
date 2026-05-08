@@ -42,7 +42,9 @@ export class ReportsService {
   }
 
   async get(id: string, userId: string) {
+    console.log('Fetching report with id:', id, 'for user:', userId);
     const r = await this.repo.findOne({ where: { id }, relations: ['subject'] });
+    console.log('Found report:', r);
     if (!r) throw new NotFoundException();
     await this.ensureSubjectMember(r.subjectId, userId);
     return r;
