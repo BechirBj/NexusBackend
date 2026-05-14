@@ -80,7 +80,6 @@ export class WorkspacesService {
   async adminUpdateMemberRole(memberId: string, role: "editor" | "viewer") {
     // memberId is the membership PK (WorkspaceMember.id), NOT userId
     const x = await this.wmRepo.find();
-    console.log("All memberships:", x);
     const member = await this.wmRepo.findOne({ where: { id: memberId } });
     if (!member) throw new NotFoundException("Membership not found");
 
@@ -246,12 +245,9 @@ export class WorkspacesService {
 
     return memberships.map((m) => ({
       membershipId: m.id,
-      userId: m.userId,
       role: m.role,
       currentUserRole: currentUserMembership?.role ?? null,
       user: {
-        id: m.user.id,
-        email: m.user.email,
         name: m.user.name,
       },
     }));

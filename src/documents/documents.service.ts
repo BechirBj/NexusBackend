@@ -46,7 +46,6 @@ export class DocumentsService {
     const membership = await this.wmRepo.findOne({
       where: { workspaceId: subject.workspaceId, userId },
     });
-    console.log(membership);
 
     if (!membership) throw new ForbiddenException("Not a workspace member");
 
@@ -67,25 +66,23 @@ export class DocumentsService {
     const subject = await this.ensureSubjectEditor(subjectId, userId);
 
     const cloudFile = file as CloudinaryRawFile;
-    console.log("Cloudinary upload result:", cloudFile);
 
     const doc = this.repo.create({
       subjectId,
       title,
       filePath: cloudFile.path,
-      publicId: cloudFile.public_id,
+      publicId: cloudFile.filename,
       originalFileName: cloudFile.originalname,
       fileSize: cloudFile.size,
       uploadedBy: userId,
     });
-    console.log("Saving document entity:", doc);
 
     const saved = await this.repo.save(doc);
 
     await this.activities.create({
       workspaceId: subject.workspaceId,
       subjectId,
-      userId,
+      userId ,
       type: "DOCUMENT_UPLOAD",
       metadata: { documentId: saved.id, title },
     });
@@ -116,9 +113,7 @@ export class DocumentsService {
   }
 
   async listBySubject(subjectId: string, userId: string) {
-    // console.log(userId)
     await this.ensureSubjectMember(subjectId, userId);
-    console.log("Listing documents for subject:",await this.repo.find({ where: { subjectId } }));
     return this.repo.find({ where: { subjectId } });
   }
 
@@ -129,6 +124,9 @@ export class DocumentsService {
     });
     if (!doc) throw new NotFoundException();
     await this.ensureSubjectEditor(doc.subjectId, userId);
+    cloudinary.uploader.destroy(doc.publicId, function(error, result) {
+    });
+    
     await this.repo.delete(id);
     return { deleted: true };
   }

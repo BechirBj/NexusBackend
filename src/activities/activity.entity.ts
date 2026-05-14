@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
+import { User } from 'src/users/user.entity';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne } from 'typeorm';
 
 export type ActivityType =
   | 'DOCUMENT_UPLOAD'
@@ -17,8 +18,8 @@ export class Activity {
   @Column()
   subjectId: string;
 
-  @Column()
-  userId: string;
+  @ManyToOne(() => User)
+  user: User  ;
 
   @Column({ type: 'varchar' })
   type: ActivityType;

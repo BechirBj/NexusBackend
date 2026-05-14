@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, Res, UnauthorizedException, UseGuards } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Res,
+  UnauthorizedException,
+  UseGuards,
+} from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { RegisterDto } from "./dto/register.dto";
 import { LoginDto } from "./dto/login.dto";
@@ -28,16 +36,16 @@ export class AuthController {
   ) {
     const { accessToken } = await this.auth.login(dto.email, dto.password);
 
-const isProd = process.env.MODE_ENV === "production";
+    const isProd = process.env.MODE_ENV === "production";
 
     console.log("Setting cookie with access token:", accessToken);
     console.log("Production mode:", isProd);
 
     res.cookie("accessToken", accessToken, {
-  httpOnly: true,
-  secure: isProd,
-  sameSite: isProd ? "none" : "lax",
-});
+      httpOnly: true,
+      secure: isProd,
+      sameSite: isProd ? "none" : "lax",
+    });
 
     return { message: "Logged in successfully" };
   }
@@ -61,15 +69,12 @@ const isProd = process.env.MODE_ENV === "production";
     return { message: "Logged out" };
   }
 
- @Post("admin/login")
+  @Post("admin/login")
   async adminLogin(
     @Body() dto: AdminLoginDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const admin = await this.auth.validateAdmin(
-      dto.email,
-      dto.password,
-    );
+    const admin = await this.auth.validateAdmin(dto.email, dto.password);
 
     if (!admin) {
       throw new UnauthorizedException("Invalid credentials");
@@ -78,15 +83,13 @@ const isProd = process.env.MODE_ENV === "production";
     const { accessToken } = await this.auth.signInAdmin(admin);
 
     const isProd = process.env.MODE_ENV === "production";
-console.log("isProd:", isProd);
+    console.log("isProd:", isProd);
     res.cookie("accessToken", accessToken, {
-  httpOnly: true,
-  secure: isProd,
-  sameSite: isProd ? "none" : "lax",
-});
+      httpOnly: true,
+      secure: isProd,
+      sameSite: isProd ? "none" : "lax",
+    });
 
     return { message: "Admin logged in successfully" };
   }
-
-  
 }
