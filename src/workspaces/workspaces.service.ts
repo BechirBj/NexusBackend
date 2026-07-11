@@ -135,11 +135,13 @@ export class WorkspacesService {
   async listForUser(userId: string) {
     const memberships = await this.wmRepo.find({ where: { userId } });
     const ids = memberships.map((m) => m.workspaceId);
+
     if (!ids.length) return [];
-    return this.wsRepo.find({ where: { id: In(ids) } });
+    console.log(await this.wsRepo.find({ where: { id: In(ids) } }))
+    return  this.wsRepo.find({ where: { id: In(ids) } });
   }
 
-  async create(userId: string, name: string, description?: string) {
+  async create(userId: string, name: string, description: string) {
     const ws = this.wsRepo.create({ name, description, ownerId: userId });
     const saved = await this.wsRepo.save(ws);
     await this.wmRepo.save(

@@ -28,14 +28,14 @@ import { AdminModule } from "./admin/admin.module";
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
-        const url = config.get<string>("SUPABASE_URL");
+        const url = config.get<string>("DATABASE_URL");
         return {
           type: "postgres",
           url,
 
-          ssl: {
-            rejectUnauthorized: false,
-          },
+          // ssl: {
+          //   rejectUnauthorized: false,
+          // },
 
           autoLoadEntities: true,
 

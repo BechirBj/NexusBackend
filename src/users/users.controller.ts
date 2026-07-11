@@ -22,6 +22,7 @@ export class UsersController {
     return this.users.findById(id);
   }
 
+  @Roles(UserRole.ADMIN)
   @Delete(":id")
   delete(@Param("id") id: string) {
     return this.users.delete(id);

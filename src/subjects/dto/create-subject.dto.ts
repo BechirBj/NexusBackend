@@ -1,10 +1,12 @@
-import { IsString, IsOptional, IsUUID, IsEnum } from 'class-validator';
+import { IsString, IsOptional, IsUUID, IsEnum, IsNotEmpty } from 'class-validator';
 
 export class CreateSubjectDto {
   @IsUUID()
+  @IsNotEmpty()
   workspaceId: string;
 
   @IsString()
+  @IsNotEmpty()
   title: string;
 
   @IsOptional()

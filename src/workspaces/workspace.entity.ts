@@ -20,7 +20,7 @@ export class Workspace {
   name: string;
 
   @Column({ nullable: true })
-  description?: string;
+  description: string;
 
   @Column()
   ownerId: string;
